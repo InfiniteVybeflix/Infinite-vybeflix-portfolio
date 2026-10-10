@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════
-   INFINITE VYBEFLIX PORTFOLIO — SCRIPT
-   Fixed, Perfect, Bug-Free
+   INFINITE VYBEFLIX PORTFOLIO
    ═══════════════════════════════════════════ */
 
 // ═══════════════════════════════════════════
@@ -10,7 +9,7 @@ const CONFIG = {
   WHATSAPP_NUMBER: '254116903500',
   WHATSAPP_CHANNEL: 'https://whatsapp.com/channel/0029Vb7IABxCXC3J7ZFFsk2h',
   EMAIL: 'aevibron@gmail.com',
-  GITHUB: 'https://github.com/luckyfelistine-bot',
+  GITHUB: 'https://github.com/InfiniteVybeflix',
   LOTTIE_PATH: 'Coding.json',
   PARTICLE_COUNT: 80,
   IS_TOUCH: window.matchMedia('(pointer: coarse)').matches
@@ -224,9 +223,10 @@ function initTypingEffect() {
 
   const phrases = [
     'AI Architect & Full-Stack Developer',
-    'Building the impossible, one line at a time',
-    'Founder of Infinite Vybeflix',
-    'Nothing is impossible'
+    'Building the impossible as my default branch',
+    'Designing intelligence, engineering reality',
+    'Founder of Aevibron',
+    'Aevibron — where the impossible ships'
   ];
   let phraseIndex = 0;
   let charIndex = 0;
