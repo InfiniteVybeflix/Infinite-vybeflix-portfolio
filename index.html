@@ -60,7 +60,12 @@
     <li><a href="#skills" class="nav-link-magnetic">Skills</a></li>
     <li><a href="#experience" class="nav-link-magnetic">Experience</a></li>
     <li><a href="#contact" class="nav-link-magnetic">Contact</a></li>
+    <li><a href="#support" class="nav-link-magnetic nav-donate-link">Support</a></li>
   </ul>
+  <a href="#" class="nav-cta nav-cta-donate magnetic-btn" onclick="openDonateModal(event)" aria-label="Donate via M-Pesa">
+    <span>Donate</span>
+    <i class="fas fa-heart" style="color:#ff5d7d;margin-left:6px;"></i>
+  </a>
   <a href="https://wa.me/254116903500" target="_blank" class="nav-cta magnetic-btn">
     <span>Let's Talk</span>
     <i class="fab fa-whatsapp" style="color:#25D366;margin-left:6px;"></i>
@@ -527,6 +532,35 @@
   </div>
 </section>
 
+<!-- SUPPORT / DONATE -->
+<section class="section support-section" id="support">
+  <div class="section-header">
+    <span class="section-eyebrow">07 — Support</span>
+    <h2 class="section-title">Fuel the Vision</h2>
+    <p class="section-desc">Every shilling goes straight into servers, APIs, data and the next impossible build.</p>
+  </div>
+  <div class="support-card reveal-3d-scale">
+    <div class="support-lottie" id="support-lottie">
+      <dotlottie-wc id="support-lottie-player" src="lottie/donation.lottie" autoplay loop></dotlottie-wc>
+      <div class="support-lottie-fallback"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="support-copy">
+      <h3>Support the mission with M-Pesa</h3>
+      <p>Building Nuvuja, Maureonix, IRIS, Kaelum and the Aevibron Gateway takes compute, bandwidth and
+        late nights. If this work inspires you, you can fuel it directly from your phone — no accounts,
+        no cards. Just an STK push.</p>
+      <button type="button" class="btn btn-mpesa magnetic-btn" onclick="openDonateModal(event)">
+        <i class="fas fa-bolt"></i> Donate via M-Pesa
+      </button>
+      <div class="support-trust">
+        <span><i class="fas fa-shield-halved"></i> FortPesa secured</span>
+        <span><i class="fas fa-mobile-screen"></i> Instant STK push</span>
+        <span><i class="fas fa-user-shield"></i> No card needed</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-brand">AEVIBRON</div>
@@ -553,6 +587,40 @@
   </div>
 </div>
 
+<!-- DONATE MODAL -->
+<div class="modal-overlay" id="donate-modal">
+  <div class="modal-box donate-box">
+    <button class="modal-close" onclick="closeDonateModal()" aria-label="Close"><i class="fas fa-times"></i></button>
+    <div class="donate-head">
+      <div class="donate-badge"><i class="fas fa-mobile-screen-button"></i></div>
+      <h3>Donate via M-Pesa</h3>
+      <p>Enter any amount and your Safaricom number — an M-Pesa prompt (STK push) will pop on your phone. Enter your PIN to complete it.</p>
+    </div>
+    <form id="donate-form" onsubmit="event.preventDefault(); submitDonation();" novalidate>
+      <div class="form-group">
+        <label for="donate-amount">Amount (KES)</label>
+        <input type="number" id="donate-amount" min="1" max="1000000" step="1" inputmode="numeric" placeholder="e.g. 250" required>
+      </div>
+      <div class="form-group">
+        <label for="donate-phone">M-Pesa phone number</label>
+        <input type="tel" id="donate-phone" inputmode="tel" autocomplete="tel" placeholder="e.g. 0712 345 678" required>
+      </div>
+      <button type="submit" class="btn btn-mpesa donate-submit" id="donate-submit">
+        <i class="fas fa-bolt" id="donate-submit-icon"></i>
+        <span id="donate-submit-text">Send STK Push</span>
+      </button>
+    </form>
+    <div class="donate-status" id="donate-status" hidden>
+      <div class="donate-status-icon pending" id="donate-status-icon">
+        <i class="fas fa-circle-notch fa-spin"></i>
+      </div>
+      <p class="donate-status-title" id="donate-status-title">Check your phone…</p>
+      <p class="donate-status-detail" id="donate-status-detail">We've sent an M-Pesa prompt. Enter your PIN to complete the donation.</p>
+    </div>
+    <p class="donate-secured"><i class="fas fa-lock"></i> Powered by FortPesa · KES · Secured M-Pesa STK Push</p>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox">
   <div class="lightbox-backdrop" onclick="closeLightbox()"></div>
@@ -569,6 +637,8 @@
   <span id="toast-msg">Message sent!</span>
 </div>
 
+<!-- dotLottie player for the Support section animation -->
+<script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.11.1/dist/dotlottie-wc.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

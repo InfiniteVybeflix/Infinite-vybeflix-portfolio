@@ -12,7 +12,19 @@ const CONFIG = {
   GITHUB: 'https://github.com/InfiniteVybeflix',
   LOTTIE_PATH: 'Coding.json',
   PARTICLE_COUNT: 80,
-  IS_TOUCH: window.matchMedia('(pointer: coarse)').matches
+  IS_TOUCH: window.matchMedia('(pointer: coarse)').matches,
+
+  /* ── FORTPESA DONATIONS ─────────────────────────────────────
+     1) Deploy the `server/` folder (see INTEGRATION-README.md)
+     2) Paste the deployed backend URL below, e.g.:
+        DONATE_API_BASE: 'https://infinite-vybeflix-donations.onrender.com'
+     (no trailing slash — never put any API key in this file) */
+  DONATE_API_BASE: '',
+
+  // Place your downloaded dotLottie file at this path in the repo
+  DONATE_LOTTIE_PATH: 'lottie/donation.lottie',
+  DONATE_MIN_AMOUNT: 1,
+  DONATE_MAX_AMOUNT: 1000000
 };
 
 // ═══════════════════════════════════════════
@@ -28,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveal();
   initTiltCards();
   initLottie();
+  initDonateLottie();
   initMagneticButtons();
   initParallax();
   initScrambleText();
@@ -478,6 +491,7 @@ function closeLightbox() {
   if (e.key === 'Escape') {
     closeLightbox();
     closeApiModal();
+    closeDonateModal();
   }
 });
 
@@ -545,4 +559,203 @@ function showToast(msg) {
   setTimeout(() => {
     toast.classList.remove('show');
   }, 3000);
+}
+
+// ═══════════════════════════════════════════
+// DONATE — FORTPESA M-PESA STK PUSH
+// ═══════════════════════════════════════════
+let donatePollTimer = null;
+
+function initDonateLottie() {
+  const wrap = document.getElementById('support-lottie');
+  const player = document.getElementById('support-lottie-player');
+  if (!wrap || !player) return;
+
+  const showFallback = () => wrap.classList.add('lottie-missing');
+  const showPlayer = () => wrap.classList.add('lottie-ready');
+
+  async function checkFile() {
+    try {
+      const res = await fetch(CONFIG.DONATE_LOTTIE_PATH, { method: 'HEAD' });
+      if (res.ok) showPlayer();
+      else showFallback();
+    } catch (e) {
+      showFallback();
+    }
+  }
+
+  // Wait (up to 5s) for the dotLottie web component to register from the CDN,
+  // then verify the .lottie file actually exists before showing the player.
+  if (typeof customElements !== 'undefined' && !customElements.get('dotlottie-wc')) {
+    let waited = 0;
+    const t = setInterval(() => {
+      waited += 500;
+      if (customElements.get('dotlottie-wc')) { clearInterval(t); checkFile(); }
+      else if (waited >= 5000) { clearInterval(t); showFallback(); }
+    }, 500);
+  } else {
+    checkFile();
+  }
+}
+
+function openDonateModal(e) {
+  if (e) e.preventDefault();
+  const modal = document.getElementById('donate-modal');
+  if (!modal) return;
+
+  resetDonateUI();
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('donate-amount')?.focus(), 300);
+}
+
+function closeDonateModal() {
+  const modal = document.getElementById('donate-modal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+  stopDonatePolling();
+}
+
+function resetDonateUI() {
+  stopDonatePolling();
+  const form = document.getElementById('donate-form');
+  const status = document.getElementById('donate-status');
+  if (form) { form.style.display = ''; form.reset(); }
+  if (status) status.hidden = true;
+  setDonateSubmitting(false);
+}
+
+function setDonateSubmitting(busy) {
+  const btn = document.getElementById('donate-submit');
+  const icon = document.getElementById('donate-submit-icon');
+  const text = document.getElementById('donate-submit-text');
+  if (!btn) return;
+  btn.disabled = busy;
+  if (icon) icon.className = busy ? 'fas fa-circle-notch fa-spin' : 'fas fa-bolt';
+  if (text) text.textContent = busy ? 'Sending prompt…' : 'Send STK Push';
+}
+
+/** Accepts 07.., 7.., +254.., 254.. → returns 2547XXXXXXXX / 2541XXXXXXXX or null */
+function normalizeKenyanPhone(input) {
+  let d = String(input || '').replace(/\D+/g, '');
+  if (d.startsWith('0')) d = '254' + d.slice(1);
+  else if ((d.startsWith('7') || d.startsWith('1')) && d.length === 9) d = '254' + d;
+  if (!/^254(7\d{8}|1\d{8})$/.test(d)) return null;
+  return d;
+}
+
+function showDonateStatus(kind, title, detail) {
+  const form = document.getElementById('donate-form');
+  const status = document.getElementById('donate-status');
+  const icon = document.getElementById('donate-status-icon');
+  const titleEl = document.getElementById('donate-status-title');
+  const detailEl = document.getElementById('donate-status-detail');
+  if (!status || !icon || !titleEl || !detailEl) return;
+
+  if (form) form.style.display = 'none';
+  status.hidden = false;
+
+  const icons = {
+    pending: '<i class="fas fa-circle-notch fa-spin"></i>',
+    success: '<i class="fas fa-check"></i>',
+    failed: '<i class="fas fa-xmark"></i>'
+  };
+  icon.className = 'donate-status-icon ' + kind;
+  icon.innerHTML = icons[kind] || icons.pending;
+  titleEl.textContent = title;
+  detailEl.textContent = detail;
+}
+
+function stopDonatePolling() {
+  if (donatePollTimer) { clearInterval(donatePollTimer); donatePollTimer = null; }
+}
+
+function startDonatePolling(uuid, amount) {
+  stopDonatePolling();
+  const INTERVAL = 3000;
+  const TIMEOUT = 120000; // M-Pesa prompts expire well before this
+  let elapsed = 0;
+
+  donatePollTimer = setInterval(async () => {
+    elapsed += INTERVAL;
+
+    if (elapsed > TIMEOUT) {
+      stopDonatePolling();
+      showDonateStatus('failed', 'Prompt expired',
+        'No payment was received in time. Open the donate button to try again.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${CONFIG.DONATE_API_BASE}/api/donate/status/${encodeURIComponent(uuid)}`);
+      if (!res.ok) return; // transient error — keep polling
+      const body = await res.json().catch(() => ({}));
+
+      if (body.status === 'success') {
+        stopDonatePolling();
+        showDonateStatus('success', 'Asante sana!',
+          `KES ${amount} received — you just fueled the vision. Nothing is impossible.`);
+      } else if (body.status === 'failed') {
+        stopDonatePolling();
+        const reasons = {
+          cancelled: 'You cancelled the M-Pesa prompt. Open the donate button to try again.',
+          expired: 'The M-Pesa prompt expired before it was completed. Please try again.',
+          failed: 'The payment did not go through. Please try again.'
+        };
+        showDonateStatus('failed', 'Payment not completed',
+          reasons[body.raw_status] || 'The payment did not go through. Please try again.');
+      }
+      // still pending → keep polling
+    } catch (e) {
+      /* network hiccup — keep polling */
+    }
+  }, INTERVAL);
+}
+
+async function submitDonation() {
+  const amountEl = document.getElementById('donate-amount');
+  const phoneEl = document.getElementById('donate-phone');
+
+  if (!CONFIG.DONATE_API_BASE) {
+    showToast('Online donations are being set up — check back soon.');
+    return;
+  }
+
+  const amount = Number(amountEl ? amountEl.value : NaN);
+  if (!Number.isInteger(amount) || amount < CONFIG.DONATE_MIN_AMOUNT || amount > CONFIG.DONATE_MAX_AMOUNT) {
+    showToast(`Enter a whole amount between KES ${CONFIG.DONATE_MIN_AMOUNT} and KES ${CONFIG.DONATE_MAX_AMOUNT}.`);
+    amountEl?.focus();
+    return;
+  }
+
+  const phone = normalizeKenyanPhone(phoneEl ? phoneEl.value : '');
+  if (!phone) {
+    showToast('Enter a valid Kenyan number, e.g. 0712 345 678.');
+    phoneEl?.focus();
+    return;
+  }
+
+  setDonateSubmitting(true);
+
+  try {
+    const res = await fetch(`${CONFIG.DONATE_API_BASE}/api/donate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, phone })
+    });
+    const body = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(body?.error?.message || 'Could not send the STK push. Please try again.');
+    }
+
+    showDonateStatus('pending', 'Check your phone…',
+      `M-Pesa prompt sent for KES ${amount} to ${body.phone || phone}. Enter your PIN to complete the donation.`);
+    startDonatePolling(body.uuid, amount);
+  } catch (err) {
+    showToast(err.message || 'Something went wrong. Please try again.');
+  } finally {
+    setDonateSubmitting(false);
+  }
 }

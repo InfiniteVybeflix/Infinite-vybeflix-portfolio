@@ -1,0 +1,14 @@
+{
+  "name": "infinite-vybeflix-donations",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FortPesa M-Pesa STK push donation backend for Infinite Vybeflix portfolio (zero dependencies).",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED"
+}
