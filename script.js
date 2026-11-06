@@ -15,14 +15,13 @@ const CONFIG = {
   IS_TOUCH: window.matchMedia('(pointer: coarse)').matches,
 
   /* ── FORTPESA DONATIONS ─────────────────────────────────────
-     1) Deploy the `server/` folder (see INTEGRATION-README.md)
-     2) Paste the deployed backend URL below, e.g.:
-        DONATE_API_BASE: 'https://infinite-vybeflix-donations.onrender.com'
+     Backend deployed on Render: server/ folder
+     Health check: https://infinite-vybeflix.onrender.com/api/health
      (no trailing slash — never put any API key in this file) */
-  DONATE_API_BASE: '',
+  DONATE_API_BASE: 'https://infinite-vybeflix.onrender.com',
 
-  // Place your downloaded dotLottie file at this path in the repo
-  DONATE_LOTTIE_PATH: 'lottie/donation.lottie',
+  // Donation animation — plain Lottie JSON (no manifest needed)
+  DONATE_LOTTIE_PATH: 'lottie/donation.json',
   DONATE_MIN_AMOUNT: 1,
   DONATE_MAX_AMOUNT: 1000000
 };
@@ -567,34 +566,33 @@ function showToast(msg) {
 let donatePollTimer = null;
 
 function initDonateLottie() {
-  const wrap = document.getElementById('support-lottie');
-  const player = document.getElementById('support-lottie-player');
-  if (!wrap || !player) return;
+  const container = document.getElementById('support-lottie-player');
+  if (!container || typeof lottie === 'undefined') return;
 
-  const showFallback = () => wrap.classList.add('lottie-missing');
-  const showPlayer = () => wrap.classList.add('lottie-ready');
+  // Plays the plain Lottie JSON (lottie/donation.json) with the lottie-web
+  // library already loaded for Coding.json — no dotLottie packaging,
+  // no manifest, no fallback needed.
+  lottie.loadAnimation({
+    container: container,
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: CONFIG.DONATE_LOTTIE_PATH
+  });
+}
 
-  async function checkFile() {
-    try {
-      const res = await fetch(CONFIG.DONATE_LOTTIE_PATH, { method: 'HEAD' });
-      if (res.ok) showPlayer();
-      else showFallback();
-    } catch (e) {
-      showFallback();
-    }
-  }
-
-  // Wait (up to 5s) for the dotLottie web component to register from the CDN,
-  // then verify the .lottie file actually exists before showing the player.
-  if (typeof customElements !== 'undefined' && !customElements.get('dotlottie-wc')) {
-    let waited = 0;
-    const t = setInterval(() => {
-      waited += 500;
-      if (customElements.get('dotlottie-wc')) { clearInterval(t); checkFile(); }
-      else if (waited >= 5000) { clearInterval(t); showFallback(); }
-    }, 500);
-  } else {
-    checkFile();
+/** Header "Donate" button — glide down to the Support section and pulse it. */
+function goToSupport(e) {
+  if (e) e.preventDefault();
+  const sec = document.getElementById('support');
+  if (!sec) return;
+  sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const card = sec.querySelector('.support-card');
+  if (card) {
+    card.classList.remove('support-attention');
+    void card.offsetWidth; // restart the animation
+    card.classList.add('support-attention');
+    setTimeout(() => card.classList.remove('support-attention'), 2600);
   }
 }
 

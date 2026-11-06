@@ -62,7 +62,7 @@
     <li><a href="#contact" class="nav-link-magnetic">Contact</a></li>
     <li><a href="#support" class="nav-link-magnetic nav-donate-link">Support</a></li>
   </ul>
-  <a href="#" class="nav-cta nav-cta-donate magnetic-btn" onclick="openDonateModal(event)" aria-label="Donate via M-Pesa">
+  <a href="#support" class="nav-cta nav-cta-donate magnetic-btn" onclick="goToSupport(event)" aria-label="Donate via M-Pesa">
     <span>Donate</span>
     <i class="fas fa-heart" style="color:#ff5d7d;margin-left:6px;"></i>
   </a>
@@ -541,8 +541,7 @@
   </div>
   <div class="support-card reveal-3d-scale">
     <div class="support-lottie" id="support-lottie">
-      <dotlottie-wc id="support-lottie-player" src="lottie/donation.lottie" autoplay loop></dotlottie-wc>
-      <div class="support-lottie-fallback"><i class="fas fa-heart"></i></div>
+      <div id="support-lottie-player"></div>
     </div>
     <div class="support-copy">
       <h3>Support the mission with M-Pesa</h3>
@@ -571,6 +570,9 @@
     <a href="https://github.com/InfiniteVybeflix" target="_blank" class="footer-social-link" style="color:#f0f6fc;"><i class="fab fa-github"></i></a>
     <a href="https://whatsapp.com/channel/0029Vb7IABxCXC3J7ZFFsk2h" target="_blank" class="footer-social-link" style="color:#d4af37;"><i class="fas fa-broadcast-tower"></i></a>
   </div>
+  <button type="button" class="footer-donate magnetic-btn" onclick="openDonateModal()" aria-label="Donate via M-Pesa">
+    <i class="fas fa-heart"></i> Fuel the vision — Donate via M-Pesa
+  </button>
   <p class="footer-copy">&copy; 2026 Infinite Vybeflix. All rights reserved.</p>
 </footer>
 
@@ -637,8 +639,6 @@
   <span id="toast-msg">Message sent!</span>
 </div>
 
-<!-- dotLottie player for the Support section animation -->
-<script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.11.1/dist/dotlottie-wc.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
