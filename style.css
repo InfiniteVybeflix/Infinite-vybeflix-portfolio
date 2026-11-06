@@ -1900,6 +1900,11 @@ img { max-width: 100%; height: auto; display: block; }
   .section-title { font-size: 24px; }
   .about-photo-frame { aspect-ratio: 1/1; }
   .project-image-wrap { height: 160px; }
+  .nav-logo { font-size: 12.5px; letter-spacing: 1.5px; }
+}
+
+@media (max-width: 380px) {
+  .nav-logo span { display: none; }
 }
 
 /* ═══════════════════════════════════════════
@@ -1929,6 +1934,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* Mobile-only nav item (hidden on desktop where the gold CTA shows) */
 .nav-donate-link { display: none; }
+.nav-cta-donate-short { display: none; }
 
 .nav-cta-donate {
   margin-right: 10px;
@@ -1999,30 +2005,6 @@ img { max-width: 100%; height: auto; display: block; }
   0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
   25%      { box-shadow: 0 0 60px 6px rgba(212,175,55,0.28); border-color: rgba(212,175,55,0.55); }
   60%      { box-shadow: 0 0 30px 2px rgba(212,175,55,0.14); }
-}
-
-/* Footer donate chip */
-.footer-donate {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 22px;
-  padding: 10px 22px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-dim);
-  font: inherit;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-}
-.footer-donate i { color: var(--heart); }
-.footer-donate:hover {
-  border-color: rgba(255,93,125,0.6);
-  color: #fff;
-  box-shadow: 0 0 30px rgba(255,93,125,0.18);
-  transform: translateY(-2px);
 }
 
 .support-copy h3 {
@@ -2137,20 +2119,124 @@ img { max-width: 100%; height: auto; display: block; }
 .donate-status[hidden] { display: none; }
 
 .donate-status-icon {
-  width: 64px;
-  height: 64px;
+  position: relative;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  margin-bottom: 16px;
+  font-size: 28px;
+  margin-bottom: 18px;
 }
+
+/* glyph — success check / failed cross only */
+.donate-status-glyph {
+  position: relative;
+  z-index: 3;
+  display: none;
+  line-height: 1;
+}
+
+/* ── PENDING: phone + signal rings + rotating progress arc ── */
 .donate-status-icon.pending {
-  color: var(--gold);
-  background: var(--gold-dim);
-  border: 1px solid rgba(212,175,55,0.3);
+  background: radial-gradient(circle, rgba(0,165,79,0.10), transparent 72%);
 }
+.donate-phone, .donate-ring, .donate-radar { display: none; }
+
+.donate-status-icon.pending .donate-phone { display: flex; }
+.donate-status-icon.pending .donate-ring,
+.donate-status-icon.pending .donate-radar { display: block; }
+
+.donate-phone {
+  position: relative;
+  z-index: 2;
+  width: 36px;
+  height: 60px;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 9px;
+  background: rgba(255,255,255,0.04);
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 26px rgba(0,165,79,0.20);
+}
+.donate-phone-notch {
+  position: absolute;
+  top: 4px; left: 50%;
+  transform: translateX(-50%);
+  width: 12px; height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.25);
+}
+.donate-stk {
+  width: 26px;
+  margin-bottom: 0;
+  padding: 4px 4px 5px;
+  border-radius: 4px 4px 0 0;
+  background: #fff;
+  animation: stk-slide 3.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.donate-stk-bar {
+  display: block;
+  width: 10px; height: 3px;
+  border-radius: 2px;
+  background: var(--mpesa);
+  margin-bottom: 3px;
+}
+.donate-stk-line {
+  display: block;
+  width: 18px; height: 2px;
+  border-radius: 1px;
+  background: rgba(2,6,10,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.donate-stk-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0,165,79,0.55), transparent);
+  animation: stk-shimmer 1.6s linear infinite;
+}
+@keyframes stk-slide {
+  0%   { transform: translateY(110%); }
+  26%  { transform: translateY(0); }
+  84%  { transform: translateY(0); }
+  100% { transform: translateY(110%); }
+}
+@keyframes stk-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.donate-radar {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(0,165,79,0.45);
+  opacity: 0;
+  animation: radar 2.4s ease-out infinite;
+}
+.donate-radar.r2 { animation-delay: 1.2s; }
+@keyframes radar {
+  0%   { transform: scale(0.62); opacity: 0.5; }
+  70%  { opacity: 0.12; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+.donate-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: conic-gradient(var(--mpesa) 0 70deg, rgba(0,165,79,0.15) 70deg 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 2.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 2.5px));
+  animation: ring-rotate 1.6s linear infinite;
+}
+@keyframes ring-rotate { to { transform: rotate(360deg); } }
+
+/* ── SUCCESS / FAILED: classic circle ── */
 .donate-status-icon.success {
   color: #4ade80;
   background: var(--mpesa-dim);
@@ -2164,9 +2250,87 @@ img { max-width: 100%; height: auto; display: block; }
   border: 1px solid rgba(244,63,94,0.3);
   animation: status-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.donate-status-icon.success .donate-status-glyph,
+.donate-status-icon.failed .donate-status-glyph { display: block; }
 @keyframes status-pop {
   0% { transform: scale(0.4); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Step timeline: Prompt sent → Enter PIN → Confirmation ── */
+.donate-steps {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 16px 0 0;
+  padding: 13px 12px 0;
+  border-top: 1px solid var(--border);
+  width: 100%;
+  max-width: 320px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.donate-steps .step { display: flex; align-items: center; gap: 6px; }
+.donate-steps .step-dot {
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  color: transparent;
+  background: transparent;
+  flex-shrink: 0;
+  transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
+.donate-status[data-state="pending"] .step:nth-child(1) { color: var(--text-muted); }
+.donate-status[data-state="pending"] .step:nth-child(1) .step-dot {
+  background: var(--mpesa); border-color: var(--mpesa); color: #fff;
+}
+.donate-status[data-state="pending"] .step:nth-child(2) { color: #fff; }
+.donate-status[data-state="pending"] .step:nth-child(2) .step-dot {
+  border-color: var(--mpesa);
+  animation: step-breathe 1.8s ease-in-out infinite;
+}
+@keyframes step-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,165,79,0.45); }
+  50%      { box-shadow: 0 0 0 5px rgba(0,165,79,0); }
+}
+
+.donate-status[data-state="success"] .step { color: var(--text-muted); }
+.donate-status[data-state="success"] .step-dot {
+  background: var(--mpesa); border-color: var(--mpesa); color: #fff;
+}
+
+.donate-status[data-state="failed"] .donate-steps,
+.donate-status[data-state="failed"] .donate-timebar { display: none; }
+
+/* ── Time bar: drains over the 2-minute prompt window ── */
+.donate-timebar {
+  width: 200px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+  margin-top: 15px;
+  overflow: hidden;
+}
+.donate-timebar span {
+  display: block;
+  width: 100%; height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--mpesa), #34d399);
+  transform-origin: left center;
+}
+.donate-timebar.run span { animation: timebar-drain 120s linear forwards; }
+@keyframes timebar-drain {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
 }
 
 .donate-status-title {
@@ -2201,6 +2365,17 @@ img { max-width: 100%; height: auto; display: block; }
 @media (max-width: 768px) {
   .nav-donate-link { display: block; }
   .nav-donate-link a { color: var(--gold); }
+
+  /* Always-visible Donate pill in the top bar — donation is reachable
+     the moment the page opens, on every screen size */
+  .nav-cta-donate {
+    display: inline-flex;
+    padding: 7px 13px;
+    font-size: 10px;
+    margin-right: 12px;
+  }
+  .nav-cta-donate-full { display: none; }
+  .nav-cta-donate-short { display: inline; }
 
   .support-card {
     grid-template-columns: 1fr;

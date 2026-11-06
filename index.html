@@ -62,8 +62,9 @@
     <li><a href="#contact" class="nav-link-magnetic">Contact</a></li>
     <li><a href="#support" class="nav-link-magnetic nav-donate-link">Support</a></li>
   </ul>
-  <a href="#support" class="nav-cta nav-cta-donate magnetic-btn" onclick="goToSupport(event)" aria-label="Donate via M-Pesa">
-    <span>Donate</span>
+  <a href="#support" class="nav-cta nav-cta-donate magnetic-btn" onclick="goToSupport(event)" aria-label="Fuel the Vision — Donate via M-Pesa" title="Fuel the Vision — Donate via M-Pesa">
+    <span class="nav-cta-donate-full">Fuel the Vision</span>
+    <span class="nav-cta-donate-short">Donate</span>
     <i class="fas fa-heart" style="color:#ff5d7d;margin-left:6px;"></i>
   </a>
   <a href="https://wa.me/254116903500" target="_blank" class="nav-cta magnetic-btn">
@@ -552,7 +553,7 @@
         <i class="fas fa-bolt"></i> Donate via M-Pesa
       </button>
       <div class="support-trust">
-        <span><i class="fas fa-shield-halved"></i> FortPesa secured</span>
+        <span><i class="fas fa-shield-halved"></i> Secured</span>
         <span><i class="fas fa-mobile-screen"></i> Instant STK push</span>
         <span><i class="fas fa-user-shield"></i> No card needed</span>
       </div>
@@ -570,9 +571,6 @@
     <a href="https://github.com/InfiniteVybeflix" target="_blank" class="footer-social-link" style="color:#f0f6fc;"><i class="fab fa-github"></i></a>
     <a href="https://whatsapp.com/channel/0029Vb7IABxCXC3J7ZFFsk2h" target="_blank" class="footer-social-link" style="color:#d4af37;"><i class="fas fa-broadcast-tower"></i></a>
   </div>
-  <button type="button" class="footer-donate magnetic-btn" onclick="openDonateModal()" aria-label="Donate via M-Pesa">
-    <i class="fas fa-heart"></i> Fuel the vision — Donate via M-Pesa
-  </button>
   <p class="footer-copy">&copy; 2026 Infinite Vybeflix. All rights reserved.</p>
 </footer>
 
@@ -612,12 +610,28 @@
         <span id="donate-submit-text">Send STK Push</span>
       </button>
     </form>
-    <div class="donate-status" id="donate-status" hidden>
+    <div class="donate-status" id="donate-status" hidden data-state="pending">
       <div class="donate-status-icon pending" id="donate-status-icon">
-        <i class="fas fa-circle-notch fa-spin"></i>
+        <span class="donate-ring" aria-hidden="true"></span>
+        <span class="donate-radar r1" aria-hidden="true"></span>
+        <span class="donate-radar r2" aria-hidden="true"></span>
+        <span class="donate-phone" aria-hidden="true">
+          <span class="donate-phone-notch"></span>
+          <span class="donate-stk">
+            <span class="donate-stk-bar"></span>
+            <span class="donate-stk-line"></span>
+          </span>
+        </span>
+        <span class="donate-status-glyph" id="donate-status-glyph"></span>
       </div>
       <p class="donate-status-title" id="donate-status-title">Check your phone…</p>
       <p class="donate-status-detail" id="donate-status-detail">We've sent an M-Pesa prompt. Enter your PIN to complete the donation.</p>
+      <ol class="donate-steps" id="donate-steps" aria-hidden="true">
+        <li class="step"><span class="step-dot"><i class="fas fa-check"></i></span>Prompt sent</li>
+        <li class="step"><span class="step-dot"><i class="fas fa-check"></i></span>Enter PIN</li>
+        <li class="step"><span class="step-dot"><i class="fas fa-check"></i></span>Confirmation</li>
+      </ol>
+      <div class="donate-timebar" id="donate-timebar" aria-hidden="true"><span></span></div>
     </div>
     <p class="donate-secured"><i class="fas fa-lock"></i> Powered by FortPesa · KES · Secured M-Pesa STK Push</p>
   </div>

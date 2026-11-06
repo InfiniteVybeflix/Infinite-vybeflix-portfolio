@@ -647,22 +647,31 @@ function showDonateStatus(kind, title, detail) {
   const form = document.getElementById('donate-form');
   const status = document.getElementById('donate-status');
   const icon = document.getElementById('donate-status-icon');
+  const glyph = document.getElementById('donate-status-glyph');
   const titleEl = document.getElementById('donate-status-title');
   const detailEl = document.getElementById('donate-status-detail');
+  const timebar = document.getElementById('donate-timebar');
   if (!status || !icon || !titleEl || !detailEl) return;
 
   if (form) form.style.display = 'none';
   status.hidden = false;
+  status.dataset.state = kind;   // drives the step timeline via CSS
 
-  const icons = {
-    pending: '<i class="fas fa-circle-notch fa-spin"></i>',
+  const glyphs = {
+    pending: '',
     success: '<i class="fas fa-check"></i>',
     failed: '<i class="fas fa-xmark"></i>'
   };
   icon.className = 'donate-status-icon ' + kind;
-  icon.innerHTML = icons[kind] || icons.pending;
+  if (glyph) glyph.innerHTML = glyphs[kind] ?? '';
   titleEl.textContent = title;
   detailEl.textContent = detail;
+
+  // restart the 2-minute prompt window bar on each new pending state
+  if (timebar) {
+    timebar.classList.remove('run');
+    if (kind === 'pending') { void timebar.offsetWidth; timebar.classList.add('run'); }
+  }
 }
 
 function stopDonatePolling() {
